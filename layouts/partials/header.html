@@ -4,9 +4,11 @@
 
     {{ if or (not (.Param "hideHeader")) .IsHome }}
 
-    <h1 class="header-title">
-        <a href="{{ site.BaseURL }}">{{ site.Title }}</a>
-    </h1>
+    {{ if ne .Kind "page" }} 
+        <h1 class="header-title">
+            <a href="{{ site.BaseURL }}">{{ site.Title }}</a>
+        </h1>
+    {{ end }}
 
     <div class="flex">
         {{ $currentPage := . }}
