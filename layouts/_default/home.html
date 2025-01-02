@@ -16,46 +16,33 @@
 </div>
 {{ end }}
 
-{{/* Social Icons */}}
+{{/* Fetch entries from both posts and notes */}}
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ $notes := where .Site.RegularPages "Section" "notes" }}
 
-{{ with site.Params.social }}
-<div class="social-icons">
-    {{- range . }}
-    <a href="{{ trim .url " " | safeURL }}" target="_blank"
-        rel="noopener noreferrer me"
-        title="{{ (.title | default .name) | title }}">
-        {{ partial "svg.html" . }}
-    </a>
-    {{- end }}
-</div>
-{{ end }}
-
-{{/* Collection Section */}}
-
-{{ if .Site.Params.homeCollection }}
 
 <div class="list-container">
-    {{ with .Site.Params.homeCollectionTitle}}
-    <h1> {{ . }} </h1>
+    <h2>Latest</h2>
+
+    {{ $latestEntries := sort (
+        first 5 ($posts) | union (first 3  ($notes))
+    ) "Date" "desc" }}
+
+    {{ range $index, $page := $latestEntries }}
+        {{ partial "home-entry.html" $page }}
     {{ end }}
 
-    {{ $pages := where .Site.RegularPages "Section" .Site.Params.homeCollection
+    <h2>Featured</h2>
+    {{ $allEntries := $posts | union $notes  }}
+    {{ $featuredEntries :=
+        sort (where $allEntries ".Params.Featured" true) "Date" "desc"
     }}
 
-    {{ $paginationSize := 1}}
-    {{ if (gt .Site.Params.paginationSize 0) }}
-    {{ $paginationSize = .Site.Params.paginationSize }}
+    {{ range $index, $page := $featuredEntries }}
+        {{ partial "home-entry.html" $page }}
     {{ end }}
 
-    {{ $paginator := .Paginate $pages $paginationSize }}
-
-    {{ range $index, $page := $paginator.Pages }}
-    {{ partial "post-entry.html" $page}}
-    {{ end }}
-
-    {{ partial "pagination-controls.html" $paginator}}
-
-    {{ end }}
 </div>
+
 
 {{ end }}
